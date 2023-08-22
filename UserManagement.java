@@ -56,6 +56,29 @@ public class UserManagement {
 		return count;
 	}
 	/*
+	 * Helper Function to check count of employee
+	 */
+	private static int countOfEmployee() throws SQLException {
+		String count_query = "select count(*) from employee;";
+		int total_count  = 0;
+		Statement statement = null;
+		try {
+			statement  = cursor.createStatement();;
+			ResultSet result_set = statement.executeQuery(count_query);
+			while(result_set.next()) {
+				total_count += 1;
+			}
+	
+		} catch(SQLException sql) {
+			sql.printStackTrace();
+			System.out.println("Failed to Count Employee ");
+		} finally {
+			statement.close();
+			System.out.println("Closed Prepared Statement Pipe ");
+		}
+		return total_count;
+	}
+	/*
 	 * Function to check or create employee table.
 	 */
 	private static void createOrcheckEmployeeTable() throws SQLException {
@@ -179,6 +202,11 @@ public class UserManagement {
 	 */
 	private static void deleteEmployee() throws SQLException{
 		
+		if(countOfEmployee() == 1) {
+			System.out.println("No Record Exists !");
+			return; 
+		}
+		
 		int emp_id;
 		String select_query = "Delete from Employee where emp_id = ?;";
 		System.out.print("Enter the Employee Id to be deleted :");
@@ -194,7 +222,6 @@ public class UserManagement {
 			
 			if(row_deleted == 0) System.out.println("Employee ID Doesn't Exist!");
 			else System.out.println("Total "+ row_deleted + " row Deleted.");
-	
 			
 		}catch(SQLException sql) {
 			sql.printStackTrace();
@@ -212,6 +239,11 @@ public class UserManagement {
 	private static void updateEmployee() throws SQLException{
 		Employee employee = new Employee();
 		int emp_dob_day,emp_dob_month,emp_dob_year;
+		
+		if(countOfEmployee() == 1) {
+			System.out.println("No Record Exists !");
+			return; 
+		}
 	
 		String update_query = "Update Employee set "
 				+ " emp_first_name = ?,"
@@ -229,10 +261,12 @@ public class UserManagement {
 		
 		System.out.print("Enter Employee ID to be updated :");
 		employee.emp_id = read.nextInt();
+		
 		if(isEmployeePresent(employee.emp_id) == 0) {
 			System.out.println("Employee Doesn't Exists !");
 			return;
 		}
+		
 		read.nextLine();
 		System.out.print("Enter Employee First Name :");
 		employee.emp_first_name = read.nextLine();
@@ -306,6 +340,12 @@ public class UserManagement {
 	 * Function to Display All Employees
 	 */
 	private static void displayAllEmployee()  throws SQLException{
+		
+		if(countOfEmployee() == 1) {
+			System.out.println("No Record Exists !");
+			return; 
+		}
+		
 		int count = 0;
 		String select_query = "Select * from Employee ;";
 		
@@ -334,11 +374,16 @@ public class UserManagement {
 	 * Function to Display Employee Info with Employee ID
 	 */
 	private static void displayAnEmployee() throws SQLException {
+		
+		if(countOfEmployee() == 1) {
+			System.out.println("No Record Exists !");
+			return; 
+		} 
+		
 		int count = 0,emp_id;
 		String select_query = "Select * from Employee where emp_id = ?;";
 		System.out.print("Enter the Employee Id to be displayed :");
 		emp_id = read.nextInt();
-		
 		PreparedStatement prepared_statement  = null;
 		
 		try {
